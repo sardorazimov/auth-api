@@ -8,16 +8,14 @@
 #define INTERVAL_SEC 2
 #define BUFFER_SIZE 512
 
-// Sistem metriklerini tutacak low-level veri yapısı
 typedef struct {
     uint64_t total_ram;
     uint64_t free_ram;
     double cpu_usage;
 } sys_metrics_t;
 
-// Modüller arası kontrat fonksiyonları
 int init_socket(void);
 void collect_metrics(sys_metrics_t *metrics);
-void send_metrics(int sock_fd, const sys_metrics_t *metrics);
+int send_metrics(int sock_fd, const sys_metrics_t *metrics);
 
-#endif // AGENT_H
+#endif
