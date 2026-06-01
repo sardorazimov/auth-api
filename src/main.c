@@ -17,9 +17,10 @@ static void handle_shutdown(int signal_number) {
 }
 
 static void print_usage(const char *program_name) {
-    printf("Usage: %s [--foreground] [--once] [--help]\n", program_name);
+    printf("Usage: %s [--foreground] [--once] [--hud] [--help]\n", program_name);
     printf("  --foreground  Terminalde calisir, loglari stdout/stderr'e yazar.\n");
     printf("  --once        Bir metrik paketi gonderip cikar.\n");
+    printf("  --hud         Kucuk transparan health panelini gosterir.\n");
     printf("  --help        Bu yardimi gosterir.\n");
 }
 
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
     sys_metrics_t metrics;
     int foreground = 0;
     int once = 0;
+    int hud = 0;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--foreground") == 0) {
@@ -101,6 +103,10 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(argv[i], "--once") == 0) {
             once = 1;
             foreground = 1;
+        } else if (strcmp(argv[i], "--hud") == 0) {
+            hud = 1;
+            foreground = 1;
+            once = 1;
         } else if (strcmp(argv[i], "--help") == 0) {
             print_usage(argv[0]);
             return 0;
@@ -119,6 +125,12 @@ int main(int argc, char *argv[]) {
     if (install_signal_handlers() < 0) {
         perror("[Miransas-Agent] Sinyal handler kurulumu basarisiz");
         return 1;
+    }
+
+    if (hud) {
+        collect_metrics(&metrics);
+        show_health_hud(&metrics);
+        return 0;
     }
 
     sock_fd = init_socket();

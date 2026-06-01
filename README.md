@@ -1,8 +1,12 @@
 # miransas-agent
 
-`miransas-agent`, macOS uzerinde sistem metriklerini okuyup UDP ile JSON olarak gonderen kucuk bir C agent'idir. RAM bilgisi icin `sysctl` ve Mach VM istatistiklerini, CPU kullanimi icin Mach processor tick farklarini kullanir.
+`miransas-agent`, macOS uzerinde sistem ve uygulama sagligi izleme fikri icin gelistirilen hafif bir agent prototipidir. Su an CPU/RAM metriklerini okur, UDP ile JSON gonderebilir ve ekranda kucuk transparan bir health paneli gosterebilir.
+
+RAM bilgisi icin `sysctl` ve Mach VM istatistiklerini, CPU kullanimi icin Mach processor tick farklarini kullanir. Health paneli macOS Cocoa ile yazilmistir.
 
 ## Derleme
+
+Derleme icin macOS geliştirici araclari gerekir. Makefile C dosyalarini ve Cocoa tabanli `src/hud.m` dosyasini birlikte derler.
 
 ```bash
 make
@@ -32,6 +36,12 @@ Terminalde surekli calistirmak ve loglari gormek icin:
 
 ```bash
 ./bin/miransas_agent --foreground
+```
+
+Kucuk transparan health panelini ekranda gostermek icin:
+
+```bash
+./bin/miransas_agent --hud
 ```
 
 Argumansiz calistirildiginda POSIX daemon olarak arka plana ayrilir:
@@ -73,4 +83,4 @@ Sonra macOS LaunchAgent olarak yukleyebilirsin.
 
 ## Notlar
 
-`auth.c` ayri bir demo dosyasidir ve mevcut Makefile tarafindan agent binary'sine dahil edilmez. Agent'in aktif kaynaklari `src/` ve `include/` altindadir.
+Aktif kaynaklar `src/` ve `include/` altindadir. Siradaki buyuk adim, calisan uygulamalari process bazinda okuyup health panelinde uygulama adi, calisma suresi, CPU ve RAM kullanimi olarak gostermektir.

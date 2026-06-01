@@ -17,5 +17,6 @@ typedef struct {
 int init_socket(void);
 void collect_metrics(sys_metrics_t *metrics);
 int send_metrics(int sock_fd, const sys_metrics_t *metrics);
+void show_health_hud(const sys_metrics_t *metrics);
 
 #endif
