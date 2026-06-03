@@ -71,7 +71,34 @@ uninstall:
 hud: all
 	$(TARGET) --hud
 
-bundle: all
+icon:
+	@if [ ! -f assets/icon.svg ]; then \
+		echo "[Miransas-Icon] assets/icon.svg yok, atlandi."; \
+	else \
+		set -e; \
+		if command -v rsvg-convert >/dev/null 2>&1; then \
+			rsvg-convert -w 1024 -h 1024 assets/icon.svg -o /tmp/miransas_icon_1024.png; \
+		elif command -v qlmanage >/dev/null 2>&1; then \
+			rm -f /tmp/icon.svg.png; \
+			qlmanage -t -s 1024 -o /tmp assets/icon.svg >/dev/null 2>&1; \
+			mv /tmp/icon.svg.png /tmp/miransas_icon_1024.png; \
+		else \
+			echo "[Miransas-Icon] HATA: rsvg-convert gerekli. brew install librsvg" >&2; \
+			exit 1; \
+		fi; \
+		rm -rf assets/AppIcon.iconset; \
+		mkdir -p assets/AppIcon.iconset; \
+		for spec in "16 icon_16x16" "32 icon_16x16@2x" "32 icon_32x32" "64 icon_32x32@2x" "128 icon_128x128" "256 icon_128x128@2x" "256 icon_256x256" "512 icon_256x256@2x" "512 icon_512x512" "1024 icon_512x512@2x"; do \
+			set -- $$spec; \
+			sips -z $$1 $$1 /tmp/miransas_icon_1024.png --out "assets/AppIcon.iconset/$$2.png" >/dev/null; \
+		done; \
+		iconutil -c icns assets/AppIcon.iconset -o assets/AppIcon.icns; \
+		rm -rf assets/AppIcon.iconset; \
+		rm -f /tmp/miransas_icon_1024.png; \
+		echo "[Miransas-Icon] assets/AppIcon.icns uretildi"; \
+	fi
+
+bundle: all icon
 	rm -rf "$(APP_BUNDLE)"
 	mkdir -p "$(APP_BUNDLE)/Contents/MacOS"
 	mkdir -p "$(APP_BUNDLE)/Contents/Resources"
@@ -95,4 +122,4 @@ dmg: bundle
 	hdiutil create -volname "Miransas Pulse" -srcfolder "$(DMG_STAGING)" -ov -format UDZO "$(DMG_PATH)"
 	@echo "[Miransas-DMG] Hazir: $(DMG_PATH)"
 
-.PHONY: all clean install uninstall hud bundle dmg
+.PHONY: all clean install uninstall hud icon bundle dmg
